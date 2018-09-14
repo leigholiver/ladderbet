@@ -1,0 +1,663 @@
+<html>
+	<head>
+		<title>Ladderbet</title>
+		<style>
+			/* site css */
+			body {
+				font-family: "Arial, Helvetica, sans-serif";
+			}
+
+			.header {
+			    position: fixed;
+			    width: 100%;
+			    max-width: 1024px;
+			    z-index: 2;
+			    padding: 10px 10px 10px 10px;
+			    background-color: white;
+			    top: 0px;
+			    height: 30px;
+			}
+
+			input, select, textarea, button {
+				margin: 0.1em;
+				border-radius: 0.3em;
+			    border: 1px solid #d0d0d0;
+			}
+
+			select, button {
+				background-color: #f0f0f0;
+			}
+
+			input {
+		    	padding: 2px 6px;
+			}
+
+			input:not([type='radio']), select {
+				width: 250px;
+			}
+
+			textarea {
+				height: 396px;
+    			width: 414px;
+    		}
+
+    		#save-button {
+			    position: absolute;
+    			margin: 3px 15px;
+    		}
+
+    		.container {
+    			max-width: 1024px;
+    			margin-left: auto;
+    			margin-right: auto;
+    		}
+
+    		.col {
+    			min-width: 400px;
+    			float: left;
+    		}
+
+    		.colA {
+    			width: 55%;
+    		}
+
+    		.colB {
+    			width: 45%;
+    		}
+		</style>
+		<style>
+    		/* display css */
+			/* the main container for the widget */
+			.scene {
+				position: relative;
+			}
+
+			.progress, .win {
+    			border-radius: 10px;
+			}
+
+			/* the rear bar. always 100% width and acts as a lose/playerB box when covered by the win box */
+			.progress {
+				width: 100%;
+				height: 50px;
+				font-size: 2em;
+				font-weight: bold;
+			}
+
+			.lose {
+				background-color: #ef3e3e;
+			}
+
+			/* the win/player A box. width of this will be set based on the bet % */
+			.win {
+				height: 100%; 
+				background-color: #14ff7a;
+			}
+
+			/* class for all text on the widget */
+			.text {
+				color: #FFF;
+				text-shadow:
+			        0.07em 0 black,
+			        0 0.07em black,
+			        -0.07em 0 black,
+			        0 -0.07em black,
+			        -0.07em -0.07em black,
+			        -0.07em 0.07em black,
+			        0.07em -0.07em black,
+			        0.07em 0.07em black;
+			}
+
+			/* the text displayed on the lose/playerB side */
+			.lose-text {
+				margin-right: 20px;
+				margin-top: 5px;
+				position: absolute;
+				right: 0; 
+				text-align: right; 
+			}
+
+			/* the text displayed on the win/playerA side */
+			.win-text {
+				margin-left: 20px;
+				margin-top: 5px;
+				position: absolute;
+				left: 0;
+			}
+			
+			/* points text */
+			.points-text {
+				position: absolute;
+			    margin-top: 0.2em;
+			}
+
+			#win-points-text {
+				left: 35%;
+			}
+
+			#lose-points-text {
+				right: 35%;
+			}
+
+			/* player text */
+			.player-text-container, .winner-text-container {
+				height: 3.5em;
+			}
+
+			.player-text {
+				font-size: 2em;
+				margin-top: 5px;
+				position: absolute;
+			}
+
+			.playerA {
+				margin-left: 20px;
+				left: 0; 
+				text-align: left; 
+			}
+
+			.playerB {
+				margin-right: 20px;
+				right: 0; 
+				text-align: right; 
+			}
+
+			.winner {
+				text-align: center;
+				width: 100%;
+			}
+
+			/* race indicators */
+			/* these are placed by default to left of win/playerA side and right of lose/playerB side
+			 but you could change the selector to apply it to other positions/elements */
+			div.playerA.races[data-race="Terr"]::before, div.playerB.races[data-race="Terr"]::after {
+			  content: " T ";
+			}
+
+			div.playerA.races[data-race="Prot"]::before, div.playerB.races[data-race="Prot"]::after {
+			  content: " P ";
+			}
+
+			div.playerA.races[data-race="Zerg"]::before, div.playerB.races[data-race="Zerg"]::after {
+			  content: " Z ";
+			}
+
+			div.playerA.races[data-race="random"]::before, div.playerB.races[data-race="random"]::after {
+			  content: " R ";
+			}
+
+			/* container for the images */
+			.betting-image-container {
+				padding: 20px 0px;
+				text-align: center;
+			}
+		</style>
+		<style id="custom-css"></style>
+	</head>
+	<body>
+	<div class="container">
+	<div class="configure header" style="display: none;">
+		<div>
+			<h2 style="display: inline; margin-top: 5px;">Ladderbet</h2>
+			<button id="save-button">Save Settings</button>
+			<a style="float: right; margin-top: 0.3em;" href="https://github.com/leigholiver/ladderbet/" target="_blank">github</a>
+		</div>
+	</div>
+	<div style="margin-top:50px;">
+		<div class="scene">
+			<div class="betting-image-container">
+				<img src="" id="betting-image" />
+			</div>
+			<div class="progress lose">
+				<div class="points-text text" id="lose-points-text">0</div><div class="lose-text text" id="loss-text"></div>
+				<div class="win" style="width: 25%; ">
+					<div class="win-text text" id="win-text"></div><div class="points-text text" id="win-points-text">0</div>
+				</div>
+			</div>
+			<div class="player-text-container">
+				<div class="player-text playerA text"></div>
+				<div class="player-text playerB text"></div>
+			</div>
+			<div class="winner-text-container">
+				<div class="player-text winner text"></div>
+			</div>
+		</div>
+	</div>
+	<div class="configure" style="display: none;">
+		<div class="col colA">
+			<br/>
+			<strong>Appearance</strong><br/>
+			<input type="text" id="form-win-text" /> Win Text<br/>
+			<input type="text" id="form-loss-text"  /> Lose Text<br/>
+			<input type="text" id="form-player-win-text"  /> Winner Message Text<br/>
+			<input type="text" id="form-ended-show-time" /> Time to show results for (in seconds)<br/>
+			<input type="text" id="form-my-name" /> (Streamer mode) Override my name<br/>
+			<input type="text" id="form-playera-name" /> (Caster mode) Override Player A Name<br/>
+			<input type="text" id="form-playerb-name" /> (Caster mode) Override Player B Name<br/>
+			<select id="form-game-mode"><option value="streamer">Streamer Mode (Win/Lose)</option><option value="caster">Caster Mode (player names)</option></select> Game type <br/>
+			<select id="form-display-type"><option value="votes">Number of bets</option><option value="points">Amount of points bet</option></select> Display type <br/>
+			<select id="form-show-names"><option value="true">Yes</option><option value="false">No</option></select> Show player names <br/>
+			<select id="form-show-races"><option value="true">Yes</option><option value="false">No</option></select> Show player races <br/>
+			<select id="form-show-points"><option value="true">Yes</option><option value="false">No</option></select> Show point count <br/>
+			<input type="text" id="form-betting-open-image" /> Betting Open Image URL<br/>
+			<input type="text" id="form-betting-closed-image" /> Betting Closed Image URL<br/>
+			<input type="text" id="form-betting-ended-image" /> Betting Ended Image URL<br/>
+			<input type="text" id="form-betting-win-image" /> Win Image URL<br/>
+			<input type="text" id="form-betting-lose-image" /> Lose Image URL<br/>
+			<select id="form-image-location"><option>Top</option><option>Bottom</option></select> Image Position<br/>
+			<select id="form-name-position"><option>Top</option><option>Bottom</option></select> Player name Position<br/>
+			<select id="form-winner-text-position"><option>Top</option><option>Bottom</option></select> Winner text Position<br/>
+
+			<br/><strong>Chat Settings</strong><br/>
+			<input type="text" id="form-points-name"  /> Points Name<br/>
+			<input type="text" id="form-betting-open-text" /> Betting Open Text<br/>
+			<input type="text" id="form-betting-closed-text"  /> Betting Closed Text<br/>
+			<input type="text" id="form-betting-ended-text"/> Betting Ended Text<br/>
+			<input type="text" id="form-win-chat-text"/> Win Message Text<br/>
+			<input type="text" id="form-lose-chat-text"/> Lose Message Text<br/>	
+			<input type="text" id="form-player-win-chat-text"/> Caster Mode Player Win Text<br/>	
+
+			<input type="text" id="form-win-command"/> Vote Win Command<br/>
+			<input type="text" id="form-lose-command"/> Vote Lose Command<br/>
+			<select id="form-allow-multiple"><option value="true">Yes</option><option value="false">No</option></select> Restrict to 1 vote per user per game <br/>
+			<input type="text" id="form-delay"  /> Delay (in seconds)<br/>
+			<input type="text" id="form-open-for"  /> Time bets open for (in seconds)<br/>
+		</div>
+		<div class="col colB">
+			<br/>
+			<strong>Twitch Settings</strong><br/>
+			<img src="http://ttv-api.s3.amazonaws.com/assets/connect_dark.png" class="twitch-connect" href="#" /><br/>
+			<input type="hidden" id="apikey" />
+			<br/>
+			<strong>URLs</strong><br/>
+			<input type="text" readonly="readonly" id="switcher-url-display" /> SC2Switcher Webhook URL
+			<br/>
+			<strong>Paste this address into the Webhook tab of <a href="https://github.com/leigholiver/OBS-SC2Switcher" target="_blank">SC2Switcher</a></strong><br/>
+			<br/>
+			<input type="text" readonly="readonly" id="obs-url-display" /> OBS display url
+			<br/>
+			<strong>Paste this address into an OBS browser source to display on stream</strong><br/>
+			<br/><strong>Preview Settings:</strong> <button id="update-preview" onclick="$('#apikey').trigger('change'); return false;">Update</button><br/>
+			<input type="radio" id="betting-state" name="betting-state" value="open" /> Open 
+			<input type="radio" id="betting-state" name="betting-state" value="closed" /> Closed 
+			<input type="radio" id="betting-state" name="betting-state" value="ended" /> Ended 
+			<input type="radio" id="betting-state" name="betting-state" value="win" /> Win 
+			<input type="radio" id="betting-state" name="betting-state" value="lose" /> Lose <br/>
+			<input type="range" id="preview-range" min="1" max="100" value="50"> Preview Win %
+			<br/><strong>Testing</strong><br/>
+			<button onclick="simulateGameStart();">Trigger Game Start</button>
+			<button onclick="simulateVictory();">Trigger Victory</button>
+			<button onclick="simulateDefeat();">Trigger Defeat</button>
+			<br/><br/><strong>Variables (to use in text)</strong><br/>
+			$playerAName, 
+			$playerBName, 
+			$playerARace, 
+			$playerBRace, 
+			$playerAScore,
+			$playerBScore,
+			$winnerName,
+			$winnerRace,
+			$playerAVote,
+			$playerBVote
+			<br/>
+			In streamer mode, playerA variables will always be you, and player B your opponent.
+			<br/><br/><strong>Custom CSS</strong><br/>
+			<textarea id="form-custom-css"></textarea> <br/>
+		</div>
+		<div style="clear: both; height: 50px;"></div>
+	</div>
+</div>
+	<script src="http://code.jquery.com/jquery.min.js"></script>
+	<script src="https://ttv-api.s3.amazonaws.com/twitch.min.js"></script>
+	<script>
+
+		$("#switcher-url-display").click(function () {
+		   $(this).select();
+		});
+
+		$("#obs-url-display").click(function () {
+		   $(this).select();
+		});
+
+		$('input').keyup(function() { loadFromForm(); });
+		$('textarea').keyup(function() { loadFromForm(); });
+		$('input[name="betting-state"]').change(function() { loadFromForm(); });	
+		$('#preview-range').change(function() { loadFromForm(); });
+		$('select').change(function() { loadFromForm(); });
+		$('#form-image-location').change(function() { loadFromForm(); });
+
+		$('#save-button').click(function() {
+			$('#save-button').text('Saving...');
+	          var config = {
+	          	'apikey': $('#apikey').val(),
+	            'form-win-text': $('#form-win-text').val(),
+	            'form-loss-text': $('#form-loss-text').val(),
+	            'form-betting-open-image': $('#form-betting-open-image').val(),
+	            'form-betting-closed-image': $('#form-betting-closed-image').val(),
+	            'form-betting-ended-image': $('#form-betting-ended-image').val(),
+	            'form-image-location': $('#form-image-location').val(),
+	            'form-points-name': $('#form-points-name').val(),
+	            'form-betting-open-text': $('#form-betting-open-text').val(),
+	            'form-betting-closed-text': $('#form-betting-closed-text').val(),
+	            'form-betting-ended-text': $('#form-betting-ended-text').val(),
+	            'form-delay': $('#form-delay').val(),
+	            'form-open-for': $('#form-open-for').val(),
+	            'form-custom-css': $('#form-custom-css').val(),
+	            'form-betting-win-image': $('#form-betting-win-image').val(),
+				'form-betting-lose-image': $('#form-betting-lose-image').val(),
+				'form-ended-show-time': $('#form-ended-show-time').val(),
+				'form-win-command': $('#form-win-command').val(),
+				'form-lose-command': $('#form-lose-command').val(),
+				'form-allow-multiple': $('#form-allow-multiple').val(),
+				'form-display-type': $('#form-display-type').val(),
+				'form-show-names': $('#form-show-names').val(),
+				'form-show-points': $('#form-show-points').val(),
+				'form-name-position': $('#form-name-position').val(),
+				'form-game-mode': $('#form-game-mode').val(),
+				'form-show-races': $('#form-show-races').val(),
+				'form-win-chat-text': $('#form-win-chat-text').val(),
+				'form-lose-chat-text': $('#form-lose-chat-text').val(),
+				'form-player-win-chat-text': $('#form-player-win-chat-text').val(),
+				'form-player-win-text': $('#form-player-win-text').val(),
+				'form-my-name': $('#form-my-name').val(),
+				'form-playera-name': $('#form-playera-name').val(),
+				'form-playerb-name': $('#form-playerb-name').val(),
+				'form-winner-text-position': $('#form-winner-text-position').val(),
+	          };
+	          $.get(
+	          	'config',
+	          	config,
+	          	function() {
+	          		$('#save-button').text('Saved!');
+					$('#update-preview').text('Update');
+	          	});
+		});
+
+		$('#apikey').change(function() {
+		    $.get(
+		    	'config',
+		    	{ 'apikey': $(this).val() },
+		    	function(data) {
+		    		loadFromObject(JSON.parse(data));
+		    	}
+	     	);
+	     	//update the url
+	     	$('#switcher-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $(this).val());
+	     	$('#obs-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + '?display&apikey=' + $(this).val());
+		});
+
+		Twitch.init({clientId: '$TWITCHKEY'}, function(error, status) {
+		// the sdk is now loaded
+		});
+
+		$('.twitch-connect').click(function() {
+		  Twitch.login({
+		    scope: ["user_read"]
+		  });
+		});
+
+        Twitch.getStatus(function(err, status) {
+		  if (status.authenticated) {
+		    $('#apikey').val(Twitch.getToken());
+		    $('#apikey').trigger('change');
+		  }
+		});
+
+		function loadFromForm() {
+			$('#save-button').text('Unsaved Changes');
+			$('#update-preview').text('Update (You will lose unsaved changes)');
+			
+			var obj = {
+				'win-text': $("#form-win-text").val(),
+				'loss-text': $("#form-loss-text").val(),
+				'custom-css': $("#form-custom-css").val(),
+				'image-location': $('#form-image-location').val(),
+	            'open-image': $('#form-betting-open-image').val(),
+	            'closed-image': $('#form-betting-closed-image').val(),
+	            'ended-image': $('#form-betting-ended-image').val(),
+	            'win-image': $('#form-betting-win-image').val(),
+	            'lose-image': $('#form-betting-lose-image').val(),
+	            'points-name': $('#form-points-name').val(),
+	            'betting-open-text': $('#form-betting-open-text').val(),
+	            'betting-closed-text': $('#form-betting-closed-text').val(),
+	            'betting-ended-text': $('#form-betting-ended-text').val(),
+	            'delay': $('#form-delay').val(),
+	            'open-for': $('#form-open-for').val(),
+				'win': $('#preview-range').val(),
+				'state': $('input[name="betting-state"]:checked').val(),
+				'win-command': $('#form-win-command').val(),
+				'lose-command': $('#form-lose-command').val(),
+				'allow-multiple': $('#form-allow-multiple').val(),
+				'display-type': $('#form-display-type').val(),
+				'ended-show-time': $('#form-ended-show-time').val(),
+				'show-names': $('#form-show-names').val(),
+				'show-points': $('#form-show-points').val(),
+				'name-position': $('#form-name-position').val(),
+				'game-mode': $('#form-game-mode').val(),
+				'show-races': $('#form-show-races').val(),
+				'win-chat-text': $('#form-win-chat-text').val(),
+				'lose-chat-text': $('#form-lose-chat-text').val(),
+				'player-win-chat-text': $('#form-player-win-chat-text').val(),
+				'player-win-text': $('#form-player-win-text').val(),
+				'my-name': $('#form-my-name').val(),
+				'playera-name': $('#form-playera-name').val(),
+				'playerb-name': $('#form-playerb-name').val(),
+				'winner-text-position': $('#form-winner-text-position').val(),
+			};
+			loadFromObject(obj);
+		}
+
+		function loadFromObject(obj) {
+			$("#win-text").text(addVariablesToText(obj['win-text'], obj));
+			$("#form-win-text").val(obj['win-text']);
+
+			$("#loss-text").text(addVariablesToText(obj['loss-text'], obj));
+			$("#form-loss-text").val(obj['loss-text']);
+
+			$("#custom-css").text(obj['custom-css']);
+			$("#form-custom-css").val(obj['custom-css']);
+
+			$('#form-name-position').val(obj['name-position']);
+			if(obj['name-position'] == 'Bottom') {
+				$('.player-text-container').parent().append($('.player-text-container'));
+			}
+			else {
+				$('.player-text-container').parent().prepend($('.player-text-container'));
+			}           
+
+
+
+			$('#form-winner-text-position').val(obj['winner-text-position']);
+			if(obj['winner-text-position'] == 'Bottom') {
+				$('.winner-text-container').parent().append($('.winner-text-container'));
+			}
+			else {
+				$('.winner-text-container').parent().prepend($('.winner-text-container'));
+			}
+
+			$('#form-image-location').val(obj['image-location']);
+			if(obj['image-location'] == 'Bottom') {
+				$('.betting-image-container').parent().append($('.betting-image-container'));
+			}
+			else {
+				$('.betting-image-container').parent().prepend($('.betting-image-container'));
+			}
+
+
+            $('#form-betting-open-image').val(obj['open-image']);
+            $('#form-betting-closed-image').val(obj['closed-image']);
+            $('#form-betting-ended-image').val(obj['ended-image']);
+            $('#form-betting-win-image').val(obj['win-image']);
+            $('#form-betting-lose-image').val(obj['lose-image']);
+            $('#form-points-name').val(obj['points-name']);
+            $('#form-betting-open-text').val(obj['betting-open-text']);
+            $('#form-betting-closed-text').val(obj['betting-closed-text']);
+            $('#form-betting-ended-text').val(obj['betting-ended-text']);
+            $('#form-delay').val(obj['delay']);
+            $('#form-open-for').val(obj['open-for']);
+            $('#form-win-command').val(obj['win-command']);
+            $('#form-lose-command').val(obj['lose-command']);
+            $('#form-allow-multiple').val(obj['allow-multiple']);
+            $('#form-ended-show-time').val(obj['ended-show-time']);
+            $('#form-game-mode').val(obj['game-mode']);
+            $('#form-win-chat-text').val(obj['win-chat-text']);
+            $('#form-lose-chat-text').val(obj['lose-chat-text']);
+            $('#form-player-win-chat-text').val(obj['player-win-chat-text']);
+            $('#form-my-name').val(obj['my-name']);
+            $('#form-playera-name').val(obj['playera-name']);
+            $('#form-playerb-name').val(obj['playerb-name']);
+
+            $('#form-player-win-text').val(obj['player-win-text']);
+            $('.player-text.winner').text(addVariablesToText(obj['player-win-text'], obj));
+    		$(".winner-text-container").hide();
+            
+            $('#form-show-names').val(obj['show-names']);
+            if(obj['show-names'] == "true") {
+            	$('.player-text').show();
+            }
+            else {
+				$('.player-text').hide();
+            }
+
+            $('#form-show-points').val(obj['show-points']);
+            if(obj['show-points'] == "true") {
+            	$('.points-text').show();
+            }
+            else {
+				$('.points-text').hide();
+            }
+
+            $('#form-show-races').val(obj['show-races']);
+            if(obj['show-races'] == "true") {
+            	$('.player-text').addClass("races");
+            }
+            else {
+				$('.player-text').removeClass("races");
+            }
+
+            if(obj["scores"] != undefined) {
+            	$('#win-points-text').text(obj['scores']['win'] ? obj['scores']['win'] : 0);
+            	$('#lose-points-text').text(obj['scores']['lose'] ? obj['scores']['lose'] : 0);
+            }
+            
+            switch(obj['state']) {
+            	case 'open':
+            		$(".scene").show();
+            		$("#betting-image").attr("src", obj['open-image']);
+            		$(".winner-text-container").hide();
+            		break;
+        		case 'closed':
+            		$(".scene").show();
+            		$("#betting-image").attr("src", obj['closed-image']);
+            		$(".winner-text-container").hide();
+            		break;
+        		case 'ended':
+            		$(".scene").show();
+            		$("#betting-image").attr("src", obj['ended-image']);
+            		$(".winner-text-container").show();
+            		break;
+        		case 'win':
+            		$(".scene").show();
+            		$("#betting-image").attr("src", obj['win-image']);
+            		$(".winner-text-container").show();
+            		break;
+        		case 'lose':
+            		$(".scene").show();
+            		$("#betting-image").attr("src", obj['lose-image']);
+            		$(".winner-text-container").show();
+            		break;
+        		case 'hidden':
+            		$(".scene").hide();
+            		break;
+            }
+            if(obj['players'] != undefined) {
+	            if(obj['players'][1]["isme"] && obj['game-mode'] == 'streamer') {
+	            	$('.playerA').text(obj['players'][1]['name']);
+	            	$('.playerB').text(obj['players'][0]['name']);
+	            	$('.playerA').attr('data-race', obj['players'][1]['race']);
+	            	$('.playerB').attr('data-race', obj['players'][0]['race']);
+	            }
+	            else {
+	            	$('.playerA').text(obj['players'][0]['name']);
+	            	$('.playerB').text(obj['players'][1]['name']);
+
+	            	$('.playerA').attr('data-race', obj['players'][0]['race']);
+	            	$('.playerB').attr('data-race', obj['players'][1]['race']);
+	            }
+	        }
+
+			$('.win').animate({"width": obj['win'] + "%" });
+		}
+
+		function getUrlParameter(sParam) {
+		    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+		        sURLVariables = sPageURL.split('&'),
+		        sParameterName,
+		        i;
+
+		    for (i = 0; i < sURLVariables.length; i++) {
+		        sParameterName = sURLVariables[i].split('=');
+
+		        if (sParameterName[0] === sParam) {
+		            return sParameterName[1] === undefined ? true : sParameterName[1];
+		        }
+		    }
+		    return false;
+		};
+
+		if(getUrlParameter('display') != true) {
+			$('.configure').show();
+		}
+		else {
+	    	setInterval(function() { 
+		     	$('#apikey').trigger('change');
+		    }, 2 * 1000);
+		}
+
+		if(getUrlParameter('apikey')) {
+			$('#apikey').val(getUrlParameter('apikey'));
+			$('#apikey').trigger('change');
+		}
+
+		function simulateGameStart() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20true},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"enter"}'
+				);
+		}
+
+		function simulateVictory() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Victory","isme":%20true},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Defeat","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
+				);
+		}
+
+		function simulateDefeat() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20true},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
+				);
+		}
+
+		function addVariablesToText(text, config) {
+		      var playerAVote = config['win-command'];
+		      var playerBVote = config['lose-command'];
+		      if(config['game-mode'] == 'caster') {
+		        playerAVote = "!" + (config['players']? config['players'][0]['name'] : "");
+		        playerBVote = "!" + (config['players']? config['players'][1]['name'] : "");
+		      }
+			return text
+				.replace(/\$playerAName/g, config['players']? config['players'][0]['name'] : "")
+				.replace(/\$playerBName/g, config['players']? config['players'][1]['name'] : "")
+				.replace(/\$playerARace/g, config['players']? config['players'][0]['race'] : "")
+				.replace(/\$playerBRace/g, config['players']? config['players'][1]['race'] : "")
+				.replace(/\$playerAScore/g, config['scores'] ? config['scores']['win'] : 0)
+				.replace(/\$playerBScore/g, config['scores'] ? config['scores']['lose'] : 0)
+				.replace(/\$winnerName/g, config['winner'] ? config['winner'] : "")
+				.replace(/\$winnerRace/g, config['winnerRace'] ? config['winnerRace'] : "")
+				.replace(/\$points/g, config['points-name'] ? config['points-name'] : "")
+        		.replace(/\$playerAVote/g, playerAVote)
+        		.replace(/\$playerBVote/g, playerBVote)
+			;
+		}
+	</script>
+	</body>
+</html>

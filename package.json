@@ -1,0 +1,17 @@
+{
+  "name": "ladderbet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ladderbet.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ladderbet.js"
+  },
+  "dependencies": {
+    "irc": "^0.5.2",
+    "jsonfile": "=0.0.1",
+    "request": "^2.88.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

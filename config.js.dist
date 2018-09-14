@@ -1,0 +1,40 @@
+module.exports = {
+  'twitchkey': '', // the Client ID of your twitch bot app (https://glass.twitch.tv/console/apps)
+  'twitchoauth': "", // can be obtained here: http://www.twitchapps.com/tmi when logged on with bot account
+  'botname': '', //the name of your twitch bot account
+  'defaultConfig': { // the default settings provided to new users 
+        "win-text": "Win",
+        "loss-text": "Lose",
+        "open-image": "",
+        "closed-image": "",
+        "ended-image": "",
+        "image-location": "Top",
+        "points-name": "points",
+        "betting-open-text": "Betting open! use $playerAVote [amount] or $playerBVote [amount] to bet!",
+        "betting-closed-text": "Betting Closed! $playerAName: $playerAScore $points, $playerBName: $playerBScore $points",
+        "betting-ended-text": "Betting Ended! $playerAName: $playerAScore $points, $playerBName: $playerBScore $points",
+        "delay": "0",
+        "open-for": "300",
+        "custom-css": "",
+        "display-type": "votes",
+        "win-image": "",
+        "lose-image": "",
+        "ended-show-time": "0",
+        "win-command": "!win",
+        "lose-command": "!lose",
+        "allow-multiple": "false",
+        "show-names": "true",
+        "show-races": "true",
+        "show-points": "true",
+        "name-position": "Top",
+        "game-mode": "streamer",
+        "win-chat-text": "Victory! Win: $playerAScore $points, Lose: $playerBScore $points",
+        "lose-chat-text": "Defeat! Win: $playerAScore $points, Lose: $playerBScore $points",
+        "player-win-chat-text": "$winnerName ($winnerRace) is Victorious! ",
+        "player-win-text": "$winnerName ($winnerRace) wins!",
+        "winner-text-position": "Bottom",
+        "my-name": "",
+        "playera-name": "",
+        "playerb-name": ""
+	}
+};
