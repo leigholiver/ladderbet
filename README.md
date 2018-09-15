@@ -8,7 +8,7 @@ Click `Connect with Twitch`
 
 Copy the `SC2Switcher Webhook URL` into the Webhook tab of [SC2Switcher](https://github.com/leigholiver/OBS-SC2Switcher)
 
-Make sure that 'Webhook enabled' is ticked in SC2Switcher
+Make sure that 'Webhook enabled' is ticked in SC2Switcher and you have entered your username into the Usernames tab
 
 Create a new Browser Source in OBS and copy the `OBS display url ` into the URL field
 

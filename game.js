@@ -125,12 +125,16 @@ module.exports = {
       }
     }
     else {
-      if(config['my-name'] != "") {
-        for(i=0;i<data.players.length; i++) {
-          if(data.players[i]["isme"]) {
+      for(i=0;i<data.players.length; i++) {
+        if(data.players[i]["isme"]) {
+          found = true;
+          if(config['my-name'] != "") {
             data.players[i]["name"] = config['my-name'];
           }
         }
+      }
+      if(!found) {
+        return;
       }
     }  
 
@@ -181,12 +185,17 @@ module.exports = {
       }
     }
     else {
-      if(config['my-name'] != "") {
-        for(i=0;i<data.players.length; i++) {
-          if(data.players[i]["isme"]) {
+      var found = false;
+      for(i=0;i<data.players.length; i++) {
+        if(data.players[i]["isme"]) {
+          found = true;
+          if(config['my-name'] != "") {
             data.players[i]["name"] = config['my-name'];
           }
         }
+      }
+      if(!found) {
+        return;
       }
     }  
 
