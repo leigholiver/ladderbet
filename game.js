@@ -74,7 +74,10 @@ module.exports = {
     if(game == undefined) {
       return { 'win': 0, 'lose': 0 };
     }
-    var config = configs[channel];
+    var config = configs[channel];    
+    if(config == undefined) {
+      config = settings['defaultConfig'];
+    }
     var bets = game.bets;
       var win = 0;
       var loss = 0;
@@ -298,17 +301,16 @@ module.exports = {
         if(!amount || !scores[user] || scores[user] == 0) {
           amount = 0;
         }
-        else if(scores[user] >= amount) {
+        else if(scores[user]*1 >= amount) {
           // user has enough points
           scores[user] = scores[user] - amount;
         }
         else {
           // user does not have enough points
-          amount = scores[user];
+          amount = scores[user]*1;
           scores[user] = 0;
         }
         amount = (amount*1 + 25); // brucey bonus
-
         var bet = {
             user: user, 
             win: win, 
