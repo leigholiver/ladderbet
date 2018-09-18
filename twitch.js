@@ -32,14 +32,26 @@ bot.addListener("message", function (from, to, text, message) {
   // get config 
   var configs = require("./config-handler.js");
 
-  if (configs[to.substr(1)] == undefined) {
+  var config = configs[to.substr(1)];
+  if (config == undefined) {
     config = settings['defaultConfig'];
   }
   
-  if(configs[to.substr(1)]['game-mode'] == 'caster') {
-    var g =  game.getGames();
+var g =  game.getGames();
+  var found = false;
+  for(i=0;i<g[to.substr(1)]['players'].length; i++) {
+    if(g[to.substr(1)]['players'][i]["isme"]) {
+      found = true;
+      if(config['my-name'] != "") {
+        g[to.substr(1)]['players'][i]["name"] = config['my-name'];
+      }
+    }
+  }
+
+  if(!found || configs[to.substr(1)]['game-mode'] == 'caster') {
     for(var i = 0; i<g[to.substr(1)]['players'].length; i++) {
       if(cmd[0].substr(1).toLowerCase() == g[to.substr(1)]['players'][i]['name'].toLowerCase()) {
+        console.log("recording bet for " + g[to.substr(1)]['players'][i]['name'].toLowerCase());
         game.recordBet(from, to.substr(1), g[to.substr(1)]['players'][i]['name'], cmd[1]);
         break;
       }

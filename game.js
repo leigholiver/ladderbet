@@ -18,6 +18,7 @@ var timers = [];
 var clearTimers = [];
 var pointMessages = [];
 var joinedChannels = [];
+var partTimers = [];
 
 module.exports = {
   getPointMessages: function() {
@@ -40,7 +41,18 @@ module.exports = {
     var bets = game.bets;
       var win = 0;
       var loss = 0;
-      if(config['game-mode'] == 'caster') {
+
+
+    var found = false;
+    for(i=0;i<game.players.length; i++) {
+      if(game.players[i]["isme"]) {
+        found = true;
+        if(config['my-name'] != "") {
+          game.players[i]["name"] = config['my-name'];
+        }
+      }
+    }
+      if(!found || config['game-mode'] == 'caster') {
           var scores = [];
           for(var i=0;i<bets.length;i++) {
             if(scores[bets[i]['win']] == undefined) {
@@ -81,7 +93,18 @@ module.exports = {
     var bets = game.bets;
       var win = 0;
       var loss = 0;
-      if(config['game-mode'] == 'caster') {
+
+    var found = false;
+    for(i=0;i<game.players.length; i++) {
+      if(game.players[i]["isme"]) {
+        found = true;
+        if(config['my-name'] != "") {
+          game.players[i]["name"] = config['my-name'];
+        }
+      }
+    }
+
+    if(!found || config['game-mode'] == 'caster') {
           var scores = [];
           for(var i=0;i<bets.length;i++) {
             if(scores[bets[i]['win']] == undefined) {
@@ -119,7 +142,18 @@ module.exports = {
       config = settings['defaultConfig'];
     }
 
-    if(config['game-mode'] == 'caster') {
+
+    var found = false;
+    for(i=0;i<data.players.length; i++) {
+      if(data.players[i]["isme"]) {
+        found = true;
+        if(config['my-name'] != "") {
+          data.players[i]["name"] = config['my-name'];
+        }
+      }
+    }
+
+    if(!found || config['game-mode'] == 'caster') {
       if(config['playera-name']!= "") {
         data.players[0]["name"] = config['playera-name'];
       }
@@ -127,20 +161,6 @@ module.exports = {
         data.players[1]["name"] = config['playerb-name'];
       }
     }
-    else {
-      for(i=0;i<data.players.length; i++) {
-        if(data.players[i]["isme"]) {
-          found = true;
-          if(config['my-name'] != "") {
-            data.players[i]["name"] = config['my-name'];
-          }
-        }
-      }
-      if(!found) {
-        return;
-      }
-    }  
-
 
     games[channel] = {
         state: 'open',
@@ -173,13 +193,24 @@ module.exports = {
 
   },
   gameEnd: function(channel, data) {
+    console.log("game end");
     games[channel].state = 'ended';
     var config = configs[channel];
     if(config == undefined) {
       config = settings['defaultConfig'];
     }
 
-    if(config['game-mode'] == 'caster') {
+    
+    var found = false;
+    for(i=0;i<data.players.length; i++) {
+      if(data.players[i]["isme"]) {
+        found = true;
+        if(config['my-name'] != "") {
+          data.players[i]["name"] = config['my-name'];
+        }
+      }
+    }
+    if(!found || config['game-mode'] == 'caster') {
       if(config['playera-name']!= "") {
         data.players[0]["name"] = config['playera-name'];
       }
@@ -187,20 +218,6 @@ module.exports = {
         data.players[1]["name"] = config['playerb-name'];
       }
     }
-    else {
-      var found = false;
-      for(i=0;i<data.players.length; i++) {
-        if(data.players[i]["isme"]) {
-          found = true;
-          if(config['my-name'] != "") {
-            data.players[i]["name"] = config['my-name'];
-          }
-        }
-      }
-      if(!found) {
-        return;
-      }
-    }  
 
     var found = false;
     var won = false;
@@ -226,9 +243,8 @@ module.exports = {
     games[channel].winnerRace = wonRace;
 
 
-
     // if betting mode is caster mode
-    if(config['game-mode'] == 'caster') {
+    if(!found || config['game-mode'] == 'caster') {
       won = wonName;
       setTimeout(function() { 
         twitch.say('#'+channel, module.exports.addVariablesToText(config['player-win-chat-text'], channel, games[channel]));
@@ -236,13 +252,13 @@ module.exports = {
     }
     else {
       // say the win or loss text 
-      if(found && won) {
+      if(won) {
         games[channel].state='win';
         setTimeout(function() { 
           twitch.say('#'+channel, module.exports.addVariablesToText(config['win-chat-text'], channel, games[channel]));
         }, games[channel].delay * 1000);
       }
-      else if(found && !won) {
+      else if(!won) {
         games[channel].state='lose';
         setTimeout(function() { 
           twitch.say('#'+channel, module.exports.addVariablesToText(config['lose-chat-text'], channel, games[channel]));
@@ -266,8 +282,8 @@ module.exports = {
     for(var i=0;i<winners.length;i++) {
       var multiplier = winners[i].amount/winnerTotal;
       var winnings = (total*multiplier).toFixed(0);
-      msg += winners[i].user+": "+winnings+" $points! "
-      scores[winners[i].user] = (scores[winners[i].user]? scores[winners[i].user] : 0) + winnings;
+      msg += winners[i].user+": "+winnings+" $points! ";
+      scores[winners[i].user] = (scores[winners[i].user]? scores[winners[i].user] : 0)*1 + winnings*1;
     }
     if(msg != config['betting-ended-text'] + " Winners: ") {
       setTimeout(function() { 
@@ -275,13 +291,16 @@ module.exports = {
       }, games[channel].delay * 1000);
       jf.writeFileSync(scoreFile, scores);
     }
+
     // leave the channel
     if(joinedChannels[channel] == true) {
-      joinedChannels[channel] = false;
-      twitch.part("#"+channel);
+      clearTimeout(partTimers[channel]);
+      partTimers[channel] = setTimeout(function() { 
+        joinedChannels[channel] = false;
+        twitch.part("#"+channel);
+      }, 60 * 60 * 1000); // leave 1 hour after the last game end     
     }
     
-
     if(config['ended-show-time'] != 0 && config['ended-show-time'] != "0") {
       clearTimers[channel] = setTimeout(function() {
          games[channel].state='hidden';
@@ -351,7 +370,18 @@ module.exports = {
 
       var playerAVote = config['win-command'];
       var playerBVote = config['lose-command'];
-      if(config['game-mode'] == 'caster') {
+      
+      var found = false;
+      for(i=0;i<game.players.length; i++) {
+        if(game.players[i]["isme"]) {
+          found = true;
+          if(config['my-name'] != "") {
+            game.players[i]["name"] = config['my-name'];
+          }
+        }
+      }
+
+      if(!found || config['game-mode'] == 'caster') {
         playerAVote = "!" + game['players'][0]['name'];
         playerBVote = "!" + game['players'][1]['name'];
       }
