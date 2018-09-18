@@ -10,7 +10,7 @@ module.exports = {
         "ended-image": "",
         "image-location": "Top",
         "points-name": "points",
-        "betting-open-text": "Betting open! use $playerAVote or $playerBVote to bet!",
+        "betting-open-text": "Betting open! use $playerAVote or $playerBVote to bet! You have 25 free points!",
         "betting-closed-text": "Betting Closed! $playerAName: $playerAScore $points, $playerBName: $playerBScore $points",
         "betting-ended-text": "Betting Ended! $playerAName: $playerAScore $points, $playerBName: $playerBScore $points",
         "delay": "0",
