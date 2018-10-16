@@ -17,6 +17,7 @@ var games = [];
 var timers = [];
 var clearTimers = [];
 var pointMessages = [];
+var leaderboardMessages = [];
 var joinedChannels = [];
 var partTimers = [];
 
@@ -29,6 +30,9 @@ module.exports = {
   },
   getGames: function() {
     return games;
+  },
+  getLeaderboardMessages: function() {
+    return leaderboardMessages;
   },
   calculateVoteAmounts: function(channel, game) {
     if(game == undefined) {
@@ -175,7 +179,6 @@ module.exports = {
         joinedChannels[channel] = true;
         twitch.join("#"+channel);
       }
-      
       setTimeout(function() { 
         twitch.say('#'+channel, module.exports.addVariablesToText(config['betting-open-text'], channel, games[channel]));
       }, games[channel].delay * 1000);
@@ -193,7 +196,6 @@ module.exports = {
 
   },
   gameEnd: function(channel, data) {
-    console.log("game end");
     games[channel].state = 'ended';
     var config = configs[channel];
     if(config == undefined) {
@@ -285,7 +287,7 @@ module.exports = {
       msg += winners[i].user+": "+winnings+" $points! ";
       scores[winners[i].user] = (scores[winners[i].user]? scores[winners[i].user] : 0)*1 + winnings*1;
     }
-    if(msg != config['betting-ended-text'] + " Winners: ") {
+    if(winners.length > 1) {
       setTimeout(function() { 
         twitch.say('#'+channel, module.exports.addVariablesToText(msg, channel, games[channel]));
       }, games[channel].delay * 1000);
@@ -343,12 +345,31 @@ module.exports = {
   broadcastPoints: function() {
     var messages = [];
     while(msg = pointMessages.pop()) {
+      var config = configs[msg.channel.substr(1)];
+      if(config == undefined) {
+        config = settings['defaultConfig'];
+      }
+
       if(messages[msg.channel]) {
-        messages[msg.channel] += msg.user + ": " + msg.score+". ";
+        messages[msg.channel] += msg.user + ": " + msg.score+" " + config['points-name'] + ". ";
       }
       else {
-        messages[msg.channel] = msg.user + ": " + msg.score+". ";
+        messages[msg.channel] = msg.user + ": " + msg.score+" " + config['points-name'] + ". ";
       }
+    }
+    Object.keys(messages).forEach(function (key) {
+      var config = configs[key.substr(1)];
+      if(config == undefined) {
+        config = settings['defaultConfig'];
+      }
+      messages[key] += "You get 25 free " + config['points-name'] + ", bet away!";
+      twitch.say(key, messages[key])
+    });
+  },
+  broadcastLeaderboard: function() {
+    var messages = [];
+    while(msg = leaderboardMessages.pop()) {
+      messages[msg.channel] = msg.message;
     }
     Object.keys(messages).forEach(function (key) {
       twitch.say(key, messages[key])
@@ -371,13 +392,22 @@ module.exports = {
       var playerAVote = config['win-command'];
       var playerBVote = config['lose-command'];
       
+      var players = game.players;
+
+
       var found = false;
-      for(i=0;i<game.players.length; i++) {
-        if(game.players[i]["isme"]) {
+      for(i=0;i<players.length; i++) {
+        if(players[i]["isme"]) {
           found = true;
           if(config['my-name'] != "") {
             game.players[i]["name"] = config['my-name'];
           }
+
+          if(i==1) {
+            var tmp = players[0];
+            players[0] = players[1];
+            players[1] = tmp;
+          }          
         }
       }
 
@@ -387,10 +417,10 @@ module.exports = {
       }
 
       return text
-        .replace(/\$playerAName/g, game['players'][0]['name'])
-        .replace(/\$playerBName/g, game['players'][1]['name'])
-        .replace(/\$playerARace/g, game['players'][0]['race'])
-        .replace(/\$playerBRace/g, game['players'][1]['race'])
+        .replace(/\$playerAName/g, players[0]['name'])
+        .replace(/\$playerBName/g, players[1]['name'])
+        .replace(/\$playerARace/g, players[0]['race'])
+        .replace(/\$playerBRace/g, players[1]['race'])
         .replace(/\$playerAScore/g, scores['win'])
         .replace(/\$playerBScore/g, scores['lose'])
         .replace(/\$winnerName/g, game['winner'])
@@ -402,6 +432,5 @@ module.exports = {
   }
 };
 
-setInterval(module.exports.broadcastPoints, 6 * 1000);
-
- 
+setInterval(module.exports.broadcastPoints, 8 * 1000);
+setInterval(module.exports.broadcastLeaderboard, 8 * 1000); 

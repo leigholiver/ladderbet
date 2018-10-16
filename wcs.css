@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css?family=Michroma');
+
+.scene {
+    font-family: 'Michroma', sans-serif;
+    margin-top: -50px;
+    margin-bottom: 50px;
+}
+
+.player-text-container {
+width: 750px;
+}
+
+.win-text, .lose-text {
+display:none;
+}
+
+.winner-text-container {
+    position: absolute;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.winner {
+text-align: left;
+}
+
+.win{
+background-color: #0042ff;
+
+}
+
+.lose{
+background-color: #FFFFFF;
+}
+
+.text {
+letter-spacing: 1px;
+}
+
+.player-text:not(.winner) {
+text-shadow: 0.01em 0 white, 0 0.01em white, -0.01em 0 white, 0 -0.01em white, -0.01em -0.01em white, -0.01em 0.01em white, 0.01em -0.01em white, 0.01em 0.01em white;
+}
+
+.progress {
+height: 100px;
+width: 600px;
+position: relative;
+background-color: #000000;
+    z-index: -2;
+}
+
+.win {
+height: 60px;
+width: 540px !important;
+border-radius: 10px;
+}
+
+.points-text {
+    left: 0 !important;
+    position: absolute;
+background-color: #e5e5e5;
+padding: 5px 5px 0px 5px;
+margin-top: 0px;
+color: #000000;
+text-shadow: 0.02em 0 black, 0 0.02em black, -0.02em 0 black, 0 -0.02em black, -0.02em -0.02em black, -0.02em 0.02em black, 0.02em -0.02em black, 0.02em 0.02em black;
+    width: 110px !important;
+    text-align: center;
+
+}
+#win-points-text {
+height: 50px;
+top:0;
+padding-top:10px;
+}
+
+#lose-points-text {
+    top: 50%;
+    right: auto;
+    height: 50px;
+    z-index: 2;
+    margin-top: 35px;
+    padding-top: 10px;
+}
+
+.playerA {
+    top: 95px;
+    left: 120px;
+}
+
+.playerB {
+    left: 140px;
+    position: absolute;
+    width: auto;
+    text-align: left;
+top: 160px;
+margin-top: 25px;
+z-index:2;
+
+}
+.progress::after {
+content: '';
+background-color: #b4141e;
+height: 60px;
+width: 540px;
+position:relative;
+display:block;
+border-radius: 10px;
+margin-top: 25px;
+z-index:1;
+
+}
+
+.win::after {
+content: '';
+    background-color: #0000b8;
+    height: 60px;
+    width: 75px;
+    z-index: 1;
+    position: absolute;
+    display: block;
+    right: 10px;
+    border-radius: 0px 10px 10px 0px;
+    box-shadow: 10px 0px;
+color: #0042ff;
+z-index: -1;
+
+}
+.win::before {
+content: '';
+    background-color: #6d0000;
+    height: 60px;
+    width: 75px;
+    z-index: 1;
+    position: absolute;
+    display: block;
+    right: 10px;
+    border-radius: 0px 10px 10px 0px;
+margin-top: 35px;
+top: 50%;    
+box-shadow: 10px 0px;
+color: #b4141e;
+z-index: -1;
+}
+
+/* clear the regular races */
+div.playerA.races[data-race="Terr"]::before, div.playerB.races[data-race="Terr"]::after, div.playerA.races[data-race="Prot"]::before, div.playerB.races[data-race="Prot"]::after, div.playerA.races[data-race="Zerg"]::before, div.playerB.races[data-race="Zerg"]::after, div.playerA.races[data-race="random"]::before, div.playerB.races[data-race="random"]::after {
+			  content: "";
+}
+
+div.playerA.races[data-race="Terr"]::after, div.playerA.races[data-race="Prot"]::after, div.playerA.races[data-race="Zerg"]::after, div.playerA.races[data-race="random"]::after, div.playerB.races[data-race="Terr"]::after, div.playerB.races[data-race="Prot"]::after, div.playerB.races[data-race="Zerg"]::after, div.playerB.races[data-race="random"]::after {
+    width: 37px;
+    height: 60px !important;
+    position: absolute;
+    left: 405px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 2;
+}
+
+div.playerA.races[data-race="Zerg"]::after, div.playerB.races[data-race="Zerg"]::after {
+content: "";
+background-image: url('zerg.png');
+}
+
+div.playerA.races[data-race="Prot"]::after, div.playerB.races[data-race="Prot"]::after {
+content: "";
+background-image: url('protoss.png');
+}
+
+div.playerA.races[data-race="Terr"]::after, div.playerB.races[data-race="Terr"]::after {
+content: "";
+background-image: url('terran.png');
+}
+
+div.playerA.races[data-race="random"]::after, div.playerB.races[data-race="random"]::after {
+content: "";
+background-image: url('random.png');
+}
+
+
+

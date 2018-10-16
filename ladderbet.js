@@ -6,15 +6,44 @@ var http = require('http'),
   settings = require("./config.js")
   configs = require("./config-handler.js"),
   game = require("./game.js");
+  var path = require('path');
 
 var port = process.env.PORT || 8080;
-
 http.createServer(async function (req, res) {
+
   res.writeHead(200);
   var q = url.parse(req.url, true).query;
   
-  if(req.url.startsWith('/result')) {
-    
+  var allowedFiles = [
+    '/terran.png',
+    '/protoss.png',
+    '/zerg.png',
+    '/random.png',
+    '/wcs.css',
+  ];
+
+  if(allowedFiles.find(function(el) { return req.url == el; }) != undefined) {
+      var img = fs.readFileSync('.' + req.url);
+      res.end(img, 'binary');
+  }
+  else if(req.url.startsWith('/download-config')) {
+      try {
+        var channel = await twitchUsernameFromApiKey(q.apikey);
+        if(channel == settings.adminUser) {
+          var out = { scores: game.getScores(), configs: configs };
+          res.write(JSON.stringify(out));
+        }
+        else {
+          res.end();
+        }
+      }
+      catch(e) {
+        console.log(e);
+        console.log(data);
+        res.end();
+      }
+  }      
+  else if(req.url.startsWith('/result')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey);
         var data = JSON.parse(q.json);
@@ -26,6 +55,7 @@ http.createServer(async function (req, res) {
       catch(e) {
         console.log(e);
         console.log(data);
+        res.end();
       }
   }
   else if(req.url.startsWith('/config')) {

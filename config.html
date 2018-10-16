@@ -288,6 +288,9 @@
 			<button onclick="simulateGameStart();">Trigger Game Start</button>
 			<button onclick="simulateVictory();">Trigger Victory</button>
 			<button onclick="simulateDefeat();">Trigger Defeat</button>
+			<button onclick="simulateGameStartNotMe();">Game Start Caster Mode</button>
+			<button onclick="simulateGameEndPlayerA();">Player A Victory</button>
+			<button onclick="simulateGameEndPlayerB();">Player B Victory</button>
 			<br/><br/><strong>Variables (to use in text)</strong><br/>
 			$playerAName, 
 			$playerBName, 
@@ -302,6 +305,7 @@
 			<br/>
 			In streamer mode, playerA variables will always be you, and player B your opponent.
 			<br/><br/><strong>Custom CSS</strong><br/>
+			<a href="#" onclick="loadWCSTheme(); return false;">Load WCS Theme</a><br/>
 			<textarea id="form-custom-css"></textarea> <br/>
 		</div>
 		<div style="clear: both; height: 50px;"></div>
@@ -483,7 +487,7 @@
 				$('.betting-image-container').parent().prepend($('.betting-image-container'));
 			}
 
-
+ 			$('#form-display-type').val(obj['display-type']);
             $('#form-betting-open-image').val(obj['open-image']);
             $('#form-betting-closed-image').val(obj['closed-image']);
             $('#form-betting-ended-image').val(obj['ended-image']);
@@ -637,6 +641,24 @@
 				);
 		}
 
+		function simulateGameStartNotMe() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"enter"}'
+				);
+		}
+
+		function simulateGameEndPlayerA() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Victory","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Defeat","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
+				);
+		}
+
+		function simulateGameEndPlayerB() {
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
+				);
+		}
+
 		function addVariablesToText(text, config) {
 		      var playerAVote = config['win-command'];
 		      var playerBVote = config['lose-command'];
@@ -657,6 +679,11 @@
         		.replace(/\$playerAVote/g, playerAVote)
         		.replace(/\$playerBVote/g, playerBVote)
 			;
+		}
+
+		function loadWCSTheme() {
+			$("#form-custom-css").val('@import url("wcs.css");');
+			loadFromForm();
 		}
 	</script>
 	</body>
