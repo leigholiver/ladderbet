@@ -97,6 +97,7 @@ http.createServer(async function (req, res) {
               'my-name': q['form-my-name'],
               'playera-name': q['form-playera-name'],
               'playerb-name': q['form-playerb-name'],
+              'wcs-theme': q['wcs-theme'],
             }
             configs[channel] = config;
             jf.writeFileSync('data/configs.json', configs);

@@ -141,11 +141,19 @@ module.exports = {
 
   gameStart: function(channel, data) {
     clearTimeout(clearTimers[channel]);
+
+    // if there is an unfinished game, return the bets
+    // no scamaz here grimre5Heart
+    if(games[channel] && games[channel]['state'] != 'ended') {
+      for(var i=0;i<games[channel]['bets'].length; i++) {
+         scores[games[channel]['bets'][i]['user']] = (scores[games[channel]['bets'][i]['user']]? scores[games[channel]['bets'][i]['user']] : 0)*1 + games[channel]['bets'][i]['amount']*1;
+      }
+    }
+
     var config = configs[channel];
     if(config == undefined) {
       config = settings['defaultConfig'];
     }
-
 
     var found = false;
     for(i=0;i<data.players.length; i++) {

@@ -32,7 +32,7 @@
 		    	padding: 2px 6px;
 			}
 
-			input:not([type='radio']), select {
+			input:not([type='radio']):not([type='checkbox']), select {
 				width: 250px;
 			}
 
@@ -305,7 +305,8 @@
 			<br/>
 			In streamer mode, playerA variables will always be you, and player B your opponent.
 			<br/><br/><strong>Custom CSS</strong><br/>
-			<a href="#" onclick="loadWCSTheme(); return false;">Load WCS Theme</a><br/>
+			<label><input type="checkbox" name="wcs-theme" id="wcs-theme" /> Use WCS Theme</label><br/>
+			
 			<textarea id="form-custom-css"></textarea> <br/>
 		</div>
 		<div style="clear: both; height: 50px;"></div>
@@ -314,9 +315,19 @@
 	<script src="http://code.jquery.com/jquery.min.js"></script>
 	<script src="https://ttv-api.s3.amazonaws.com/twitch.min.js"></script>
 	<script>
+		var isWCSTheme = false;
 
 		$("#switcher-url-display").click(function () {
 		   $(this).select();
+		});
+
+		$("#wcs-theme").change(function () {
+		   if($(this).prop('checked')) {
+		   	WCSTheme(true);
+		   }
+		   else {
+		   	WCSTheme(false);
+		   }
 		});
 
 		$("#obs-url-display").click(function () {
@@ -367,6 +378,7 @@
 				'form-playera-name': $('#form-playera-name').val(),
 				'form-playerb-name': $('#form-playerb-name').val(),
 				'form-winner-text-position': $('#form-winner-text-position').val(),
+				'wcs-theme': $("#wcs-theme").prop('checked'),
 	          };
 	          $.get(
 	          	'config',
@@ -447,6 +459,7 @@
 				'playera-name': $('#form-playera-name').val(),
 				'playerb-name': $('#form-playerb-name').val(),
 				'winner-text-position': $('#form-winner-text-position').val(),
+				'wcs-theme': $('#wcs-theme').prop('checked'),
 			};
 			loadFromObject(obj);
 		}
@@ -590,6 +603,9 @@
 	            }
 	        }
 
+	        $('#wcs-theme').prop('checked', obj['wcs-theme']);
+	        $('#wcs-theme').trigger('change');
+
 			$('.win').animate({"width": obj['win'] + "%" });
 		}
 
@@ -681,9 +697,15 @@
 			;
 		}
 
-		function loadWCSTheme() {
-			$("#form-custom-css").val('@import url("wcs.css");');
-			loadFromForm();
+		function WCSTheme(enable) {
+			if(!isWCSTheme && enable) {
+				$('head').append('<style id="wcs-style">@import url("wcs.css");</style>');
+				isWCSTheme = true;
+			}
+			else if(isWCSTheme && !enable) {
+				$('#wcs-style').remove();
+				isWCSTheme = false;
+			}
 		}
 	</script>
 	</body>

@@ -36,6 +36,7 @@ module.exports = {
         "winner-text-position": "Bottom",
         "my-name": "",
         "playera-name": "",
-        "playerb-name": ""
+        "playerb-name": "",
+        "wcs-theme": false
 	}
 };
