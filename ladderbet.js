@@ -10,11 +10,11 @@ var http = require('http'),
 
 var port = process.env.PORT || 8080;
 http.createServer(async function (req, res) {
-
-  res.writeHead(200);
+  var urlpath = req.url;
+  urlpath = urlpath.replace(settings['base-url'], '');
   var q = url.parse(req.url, true).query;
   
-  var allowedFiles = [
+ var allowedFiles = [
     '/terran.png',
     '/protoss.png',
     '/zerg.png',
@@ -22,15 +22,17 @@ http.createServer(async function (req, res) {
     '/wcs.css',
   ];
 
-  if(allowedFiles.find(function(el) { return req.url == el; }) != undefined) {
-      var img = fs.readFileSync('.' + req.url);
+  if(allowedFiles.find(function(el) { return urlpath == el; }) != undefined) {
+      var img = fs.readFileSync('.' + urlpath);
+      res.writeHead(200);
       res.end(img, 'binary');
   }
-  else if(req.url.startsWith('/download-config')) {
+  else if(urlpath.startsWith('/download-config')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey);
         if(channel == settings.adminUser) {
           var out = { scores: game.getScores(), configs: configs };
+          res.writeHead(200);
           res.write(JSON.stringify(out));
         }
         else {
@@ -43,7 +45,7 @@ http.createServer(async function (req, res) {
         res.end();
       }
   }      
-  else if(req.url.startsWith('/result')) {
+  else if(urlpath.startsWith('/result')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey);
         var data = JSON.parse(q.json);
@@ -58,7 +60,7 @@ http.createServer(async function (req, res) {
         res.end();
       }
   }
-  else if(req.url.startsWith('/config')) {
+  else if(urlpath.startsWith('/config')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey).catch(function(e) {console.log(e)});
         // if we're updating the configuration
@@ -127,7 +129,7 @@ http.createServer(async function (req, res) {
             out['win'] = (amounts['win'] / (amounts['win'] + amounts['lose'])) * 100;
             out['scores'] = amounts;
           }
-
+          res.writeHead(200);
           res.write(JSON.stringify(out));
         }
       }
@@ -139,6 +141,7 @@ http.createServer(async function (req, res) {
   else {
       html = fs.readFileSync('./config.html', "utf8");
       html = html.replace("$TWITCHKEY", settings['twitchkey']);
+      res.writeHead(200);
       res.write(html);
   }
   res.end();

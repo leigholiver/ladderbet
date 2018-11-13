@@ -2,7 +2,7 @@
 
 
 ### Usage
-Go to the [Ladderbet site](http://ec2-35-177-209-223.eu-west-2.compute.amazonaws.com/)
+Go to the [Ladderbet site](https://leigholiver.com/ladderbet)
 
 Click `Connect with Twitch`
 

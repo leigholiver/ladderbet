@@ -1,4 +1,5 @@
 module.exports = {
+  'base-url': "", // if ladderbet web interface is running in a subdirectory, set this to the base url. eg "/ladderbet"
   'adminUser': '', // the twitch username of the bot administrator, only this user can download score/config files
   'twitchkey': '', // the Client ID of your twitch bot app (https://glass.twitch.tv/console/apps)
   'twitchoauth': "", // can be obtained here: http://www.twitchapps.com/tmi when logged on with bot account

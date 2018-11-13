@@ -266,7 +266,7 @@
 		<div class="col colB">
 			<br/>
 			<strong>Twitch Settings</strong><br/>
-			<img src="http://ttv-api.s3.amazonaws.com/assets/connect_dark.png" class="twitch-connect" href="#" /><br/>
+			<img src="//ttv-api.s3.amazonaws.com/assets/connect_dark.png" class="twitch-connect" href="#" /><br/>
 			<input type="hidden" id="apikey" />
 			<br/>
 			<strong>URLs</strong><br/>
@@ -312,8 +312,8 @@
 		<div style="clear: both; height: 50px;"></div>
 	</div>
 </div>
-	<script src="http://code.jquery.com/jquery.min.js"></script>
-	<script src="https://ttv-api.s3.amazonaws.com/twitch.min.js"></script>
+	<script src="//code.jquery.com/jquery.min.js"></script>
+	<script src="//ttv-api.s3.amazonaws.com/twitch.min.js"></script>
 	<script>
 		var isWCSTheme = false;
 
@@ -381,7 +381,7 @@
 				'wcs-theme': $("#wcs-theme").prop('checked'),
 	          };
 	          $.get(
-	          	'config',
+	          	window.location.protocol + '//' + window.location.host + window.location.pathname + '/config',
 	          	config,
 	          	function() {
 	          		$('#save-button').text('Saved!');
@@ -391,15 +391,15 @@
 
 		$('#apikey').change(function() {
 		    $.get(
-		    	'config',
+		    	window.location.protocol + '//' + window.location.host + window.location.pathname + '/config',
 		    	{ 'apikey': $(this).val() },
 		    	function(data) {
 		    		loadFromObject(JSON.parse(data));
 		    	}
 	     	);
 	     	//update the url
-	     	$('#switcher-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $(this).val());
-	     	$('#obs-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + '?display&apikey=' + $(this).val());
+	     	$('#switcher-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $(this).val());
+	     	$('#obs-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + '/?display&apikey=' + $(this).val());
 		});
 
 		Twitch.init({clientId: '$TWITCHKEY'}, function(error, status) {
@@ -646,31 +646,31 @@
 		}
 
 		function simulateVictory() {
-			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $('#apikey').val() +
 				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Victory","isme":%20true},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Defeat","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
 				);
 		}
 
 		function simulateDefeat() {
-			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $('#apikey').val() +
 				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20true},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
 				);
 		}
 
 		function simulateGameStartNotMe() {
-			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $('#apikey').val() +
 				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"enter"}'
 				);
 		}
 
 		function simulateGameEndPlayerA() {
-			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $('#apikey').val() +
 				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Victory","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Defeat","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
 				);
 		}
 
 		function simulateGameEndPlayerB() {
-			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + 'result?apikey=' + $('#apikey').val() +
+			$.get(window.location.protocol + '//' + window.location.host + window.location.pathname + '/result?apikey=' + $('#apikey').val() +
 				'&json={"players":%20[{"name":%20"playerA","type":%20"user","race":%20"Prot","result":%20"Defeat","isme":%20false},{"name":%20"playerB","type":%20"computer","race":%20"random","result":%20"Victory","isme":%20false}],"displayTime":%20"5.000000","event":%20"exit"}'
 				);
 		}
