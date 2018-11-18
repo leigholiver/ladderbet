@@ -201,8 +201,8 @@ module.exports = {
             if(config == undefined) {
               config = settings['defaultConfig'];
             }
-    
-            twitch.say('#'+channel, module.exports.addVariablesToText(configs[channel]['betting-closed-text'], channel, games[channel]));
+
+            twitch.say('#'+channel, module.exports.addVariablesToText(config['betting-closed-text'], channel, games[channel]));
           }, games[channel].delay * 1000);
         }
       }, config['open-for'] * 1000);
