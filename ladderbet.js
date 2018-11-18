@@ -10,24 +10,32 @@ var http = require('http'),
 
 var port = process.env.PORT || 8080;
 http.createServer(async function (req, res) {
+console.log("request recieved");
+console.log(req.url);
   var urlpath = req.url;
   urlpath = urlpath.replace(settings['base-url'], '');
   var q = url.parse(req.url, true).query;
   
  var allowedFiles = [
-    '/terran.png',
-    '/protoss.png',
-    '/zerg.png',
-    '/random.png',
-    '/wcs.css',
+    'terran.png',
+    'protoss.png',
+    'zerg.png',
+    'random.png',
+    'wcs.css',
   ];
 
-  if(allowedFiles.find(function(el) { return urlpath == el; }) != undefined) {
-      var img = fs.readFileSync('.' + urlpath);
+  var file = false;
+  for(var i=0; i<allowedFiles.length; i++) {
+    if(urlpath.includes(allowedFiles[i])) {
+      file = allowedFiles[i];
+    }
+  }
+  if(file) {
+      var img = fs.readFileSync('./' + file);
       res.writeHead(200);
       res.end(img, 'binary');
   }
-  else if(urlpath.startsWith('/download-config')) {
+  else if(urlpath.includes('/download-config')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey);
         if(channel == settings.adminUser) {
@@ -45,13 +53,13 @@ http.createServer(async function (req, res) {
         res.end();
       }
   }      
-  else if(urlpath.startsWith('/result')) {
+  else if(urlpath.includes('/result')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey);
         var data = JSON.parse(q.json);
         switch(data.event) {
-          case "enter": game.gameStart(channel, data); break;
-          case "exit": game.gameEnd(channel, data); break;
+          case "enter": console.log("enter game"); game.gameStart(channel, data); break;
+          case "exit": console.log("exit game"); game.gameEnd(channel, data); break;
         }
       }
       catch(e) {
@@ -60,7 +68,7 @@ http.createServer(async function (req, res) {
         res.end();
       }
   }
-  else if(urlpath.startsWith('/config')) {
+  else if(urlpath.includes('/config')) {
       try {
         var channel = await twitchUsernameFromApiKey(q.apikey).catch(function(e) {console.log(e)});
         // if we're updating the configuration

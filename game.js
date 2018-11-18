@@ -197,6 +197,11 @@ module.exports = {
         if(games[channel].state == 'open') {
           setTimeout(function() { 
             games[channel].state = 'closed';
+            var config = configs[channel];    
+            if(config == undefined) {
+              config = settings['defaultConfig'];
+            }
+    
             twitch.say('#'+channel, module.exports.addVariablesToText(configs[channel]['betting-closed-text'], channel, games[channel]));
           }, games[channel].delay * 1000);
         }
@@ -204,6 +209,7 @@ module.exports = {
 
   },
   gameEnd: function(channel, data) {
+    if(games[channel]) {
     games[channel].state = 'ended';
     var config = configs[channel];
     if(config == undefined) {
@@ -316,7 +322,7 @@ module.exports = {
          games[channel].state='hidden';
       }, (games[channel].delay + config['ended-show-time']) * 1000);
     }
-
+}
   },
 
   recordBet: function(user, channel, win, amount) {
