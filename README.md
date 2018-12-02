@@ -2,7 +2,7 @@
 
 
 ### Usage
-Go to the [Ladderbet site](https://leigholiver.com/ladderbet)
+Go to the [Ladderbet site](https://leigholiver.com/ladderbet/)
 
 Click `Connect with Twitch`
 
