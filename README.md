@@ -6,7 +6,7 @@ Go to the [Ladderbet site](https://leigholiver.com/ladderbet/)
 
 Click `Connect with Twitch`
 
-Copy the `SC2Switcher Webhook URL` into the Webhook tab of [SC2Switcher](https://github.com/leigholiver/OBS-SC2Switcher)
+Copy the `SC2Switcher Webhook URL` into the Webhook tab of the [SC2Switcher obs-studio plugin](https://github.com/leigholiver/OBS-SC2Switcher) or [SC2Switcher Standalone](https://github.com/leigholiver/SC2Switcher-Standalone)
 
 Make sure that 'Webhook enabled' is ticked in SC2Switcher and you have entered your username into the Usernames tab
 
