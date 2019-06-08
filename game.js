@@ -118,10 +118,10 @@ module.exports = {
               scores[bets[i].win] = scores[bets[i].win] + bets[i]['amount'];
             }
           }
-          if(scores[game['players'][0]['name']] != undefined) {
+          if(game['players'][0] != undefined && scores[game['players'][0]['name']] != undefined) {
               win = scores[game['players'][0]['name']];
           }
-          if(scores[game['players'][1]['name']] != undefined) {
+          if(game['players'][1] != undefined && scores[game['players'][1]['name']] != undefined) {
               loss = scores[game['players'][1]['name']];
           }
       }

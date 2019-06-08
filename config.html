@@ -266,7 +266,7 @@
 		<div class="col colB">
 			<br/>
 			<strong>Twitch Settings</strong><br/>
-			<img src="//ttv-api.s3.amazonaws.com/assets/connect_dark.png" class="twitch-connect" href="#" /><br/>
+			<a href="https://id.twitch.tv/oauth2/authorize?client_id=$TWITCHKEY&redirect_uri=http://localhost:8080&response_type=token&scope=user_read">Login with Twitch</a><br/>
 			<input type="hidden" id="apikey" />
 			<br/>
 			<strong>URLs</strong><br/>
@@ -313,7 +313,6 @@
 	</div>
 </div>
 	<script src="//code.jquery.com/jquery.min.js"></script>
-	<script src="//ttv-api.s3.amazonaws.com/twitch.min.js"></script>
 	<script>
 		var isWCSTheme = false;
 
@@ -402,22 +401,13 @@
 	     	$('#obs-url-display').val(window.location.protocol + '//' + window.location.host + window.location.pathname + '/?display&apikey=' + $(this).val());
 		});
 
-		Twitch.init({clientId: '$TWITCHKEY'}, function(error, status) {
-		// the sdk is now loaded
-		});
 
-		$('.twitch-connect').click(function() {
-		  Twitch.login({
-		    scope: ["user_read"]
-		  });
-		});
-
-        Twitch.getStatus(function(err, status) {
-		  if (status.authenticated) {
-		    $('#apikey').val(Twitch.getToken());
+		var queryDict = {};
+		window.location.hash.substr(1).split("&").forEach(function(item) {queryDict[item.split("=")[0]] = item.split("=")[1]})
+		if(queryDict['access_token'] !== undefined) {
+			$('#apikey').val(queryDict['access_token']);
 		    $('#apikey').trigger('change');
-		  }
-		});
+		}
 
 		function loadFromForm() {
 			$('#save-button').text('Unsaved Changes');
