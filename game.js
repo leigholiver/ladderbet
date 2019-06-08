@@ -333,7 +333,7 @@ module.exports = {
     }
     if(game && game.state == 'open') {
      if(!(config['allow-multiple'] == true || config['allow-multiple'] == "true") || !game.bets.find(function(bet) { return bet.user == user; })) {
-        if(!amount || !scores[user] || scores[user] == 0) {
+        if(!amount || !scores[user] || scores[user] == 0 || isNaN(amount) || amount < 0) {
           amount = 0;
         }
         else if(scores[user]*1 >= amount) {
