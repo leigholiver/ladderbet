@@ -148,7 +148,7 @@ console.log(req.url);
   }
   else {
       html = fs.readFileSync('./config.html', "utf8");
-      html = html.replace("$TWITCHKEY", settings['twitchkey']);
+      html = html.replace(/\$TWITCHKEY/g, settings['twitchkey']);
       res.writeHead(200);
       res.write(html);
   }
